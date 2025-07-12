@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Framework Company Research Platform</title>
+    <title>Company Research</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #18181B; /* Rich dark background */
+            color: #E5E7EB; /* Soft off-white */
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Lora', serif;
+            color: #ffffff;
         }
         .card {
+            background-color: #27272A; /* Slightly lighter card background */
+            border: 1px solid #3f3f46;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 0.5rem;
         }
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
         }
         .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border: 4px solid #3f3f46;
+            border-top: 4px solid #D4AF37; /* Gold accent */
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -29,273 +41,440 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #researchBtn {
+            background-color: #D4AF37;
+            color: #18181B;
+            transition: background-color 0.3s ease;
+        }
+        #researchBtn:hover {
+            background-color: #E0C56E;
+        }
         #researchBtn:disabled {
-            background-color: #a0aec0;
+            background-color: #3f3f46;
+            color: #71717A;
             cursor: not-allowed;
         }
-        .framework-select {
+        .custom-select {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23A1A1AA' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
             background-repeat: no-repeat;
-            background-position: right .7em top 50%;
-            background-size: .65em auto;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
         }
-        /* Tailwind Prose Customization */
-        .prose h3 { margin-top: 1em; margin-bottom: 0.5em; }
-        .prose p { margin-top: 0.5em; margin-bottom: 0.5em; }
-        .prose ul { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .accent-gold {
+            color: #D4AF37;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-zinc-900 text-gray-200">
 
-    <header class="bg-white shadow-sm">
-        <div class="container mx-auto px-6 py-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Company Research Platform</h1>
-            <p class="mt-2 text-md md:text-lg text-gray-600">Dynamic analysis using your chosen framework.</p>
+    <header class="bg-zinc-900/70 backdrop-blur-sm sticky top-0 z-10 border-b border-zinc-700">
+        <div class="container mx-auto px-6 py-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white">Company Research</h1>
         </div>
     </header>
 
     <main class="container mx-auto px-6 py-8">
-        <div class="max-w-3xl mx-auto mb-4 text-center">
-            <p id="error-message" class="text-red-500 font-semibold h-6"></p>
-        </div>
-        <div class="max-w-3xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-             <div class="md:col-span-2">
-                <input type="text" id="companyName" placeholder="Enter a company name (e.g., 'Netflix')" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-full">
+        <div class="max-w-4xl mx-auto mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="companyName" class="block text-sm font-medium text-zinc-400 mb-2">Company</label>
+                <input type="text" id="companyName" placeholder="e.g., Zomato" class="w-full px-4 py-3 text-lg bg-zinc-800 border border-zinc-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] h-full text-white">
             </div>
             <div>
-                 <select id="frameworkSelect" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-full framework-select bg-white">
+                <label for="businessUnitSelect" class="block text-sm font-medium text-zinc-400 mb-2">Business Unit / Product</label>
+                <select id="businessUnitSelect" class="w-full px-4 py-3 text-lg bg-zinc-800 border border-zinc-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] h-full custom-select text-white" disabled>
+                    <option value="">Enter a company first</option>
+                </select>
+            </div>
+            <div>
+                <label for="frameworkSelect" class="block text-sm font-medium text-zinc-400 mb-2">Analysis Framework</label>
+                <select id="frameworkSelect" class="w-full px-4 py-3 text-lg bg-zinc-800 border border-zinc-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] h-full custom-select text-white">
                     <option value="4C">4C Analysis</option>
-                    <option value="SWOT">SWOT Analysis</option>
                     <option value="4P">4P Marketing Mix</option>
                     <option value="5C">5C Analysis</option>
                     <option value="7P">7P Service Mix</option>
                 </select>
             </div>
+            <div class="flex items-end">
+                <button id="researchBtn" class="w-full font-semibold px-6 py-3 rounded-lg text-lg h-full">
+                    Analyze
+                </button>
+            </div>
         </div>
-        <div class="max-w-3xl mx-auto mb-8 text-center">
-            <button id="researchBtn" class="w-full md:w-1/3 bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-lg">
-                Analyze
-            </button>
+        <div class="max-w-4xl mx-auto text-center">
+             <p id="error-message" class="text-red-400 font-semibold h-6"></p>
         </div>
 
-        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Analysis cards will be dynamically inserted here -->
+
+        <div id="report-container" class="hidden mt-12">
+            <div id="report-header" class="text-center mb-12"></div>
+            
+            <!-- Key Financials Section -->
+            <div id="financials-section" class="max-w-5xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4 text-center">Key Financials</h2>
+                <div class="card p-6">
+                    <div id="financials-container" class="overflow-x-auto">
+                         <!-- Financials table or placeholder will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="model-explanation-section" class="max-w-5xl mx-auto mb-12">
+                <!-- Model explanation will be rendered here -->
+            </div>
+            
+            <div id="results-container">
+                 <!-- Main analysis will be rendered here -->
+            </div>
         </div>
+
     </main>
 
     <footer class="text-center py-6 mt-8">
-        <p class="text-gray-500">Powered by AI | Designed for ambitious job seekers.</p>
+        <p class="text-zinc-500">Powered by AI</p>
     </footer>
 
     <script>
+        // --- IMPORTANT: API KEY ---
+        // You must get your own API key and paste it here for the app to work on an external site.
+        // Get a key from Google AI Studio: https://aistudio.google.com/app/apikey
+        const USER_API_KEY = "PASTE_YOUR_API_KEY_HERE";
+        
         // --- DOM Element References ---
         const researchBtn = document.getElementById('researchBtn');
         const companyNameInput = document.getElementById('companyName');
+        const businessUnitSelect = document.getElementById('businessUnitSelect');
         const errorMessageEl = document.getElementById('error-message');
         const frameworkSelect = document.getElementById('frameworkSelect');
-        const resultsGrid = document.getElementById('resultsGrid');
+        const reportContainer = document.getElementById('report-container');
+        const reportHeader = document.getElementById('report-header');
+        const resultsContainer = document.getElementById('results-container');
+        const financialsContainer = document.getElementById('financials-container');
+        const modelExplanationSection = document.getElementById('model-explanation-section');
 
-        // --- Framework Definitions ---
+        // --- SVG Icons for Infographics ---
+        const icons = {
+            default: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`,
+            strengths: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v8"></path><path d="m8 12 h8"></path></svg>`,
+            weaknesses: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m8 12 h8"></path></svg>`,
+            opportunities: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M7 13.5 10 17l5-5"></path><path d="m7 7.5 1.5 1.5"></path></svg>`,
+            threats: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>`,
+            consumer: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+            cost: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6v1"></path><path d="M12 11v1"></path><path d="M12 16v1"></path><path d="M16.5 9.5 15 12l1.5 2.5"></path><path d="M7.5 9.5 9 12l-1.5 2.5"></path></svg>`,
+            convenience: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M14.8 9.2a2 2 0 0 0-2.2-2.2"></path><path d="M7.9 14.8a2 2 0 0 0 2.2 2.2"></path><path d="m12 12-4.4 4.4"></path><path d="m16.4 7.6 1.6-1.6"></path><path d="m6 18 1.6-1.6"></path></svg>`,
+            communication: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M21 12h-2"></path><path d="M5 12H3"></path><path d="M12 21v-2"></path><path d="M12 5V3"></path></svg>`,
+        };
+
+        const getIcon = (id) => icons[id] || icons.default;
+
+        // --- Framework Definitions with JSON prompts ---
+        const swotFramework = {
+            title: "Standard SWOT Analysis",
+            components: [
+                { id: 'strengths', title: 'Strengths', prompt: (t) => `For ${t}, list its key internal Strengths. Return as a JSON object with a "points" array of strings.` },
+                { id: 'weaknesses', title: 'Weaknesses', prompt: (t) => `For ${t}, list its key internal Weaknesses. Return as a JSON object with a "points" array of strings.` },
+                { id: 'opportunities', title: 'Opportunities', prompt: (t) => `For ${t}, list its key external Opportunities. Return as a JSON object with a "points" array of strings.` },
+                { id: 'threats', title: 'Threats', prompt: (t) => `For ${t}, list its key external Threats. Return as a JSON object with a "points" array of strings.` }
+            ]
+        };
+
         const analysisFrameworks = {
             '4C': {
+                title: "4C Analysis",
+                explanation: "The 4C model shifts the focus from the seller's perspective to the buyer's. It prioritizes understanding the Consumer's wants and needs, the total Cost to the customer, the Convenience of purchase, and the quality of Communication.",
                 components: [
-                    { id: 'consumer', title: '1. Consumer', color: 'blue', description: "Who are the customers? What are their needs, wants, and problems?", prompt: (c) => `Analyze ${c}'s "Consumer" strategy (4Cs model). Detail their target audience (demographics, psychographics), the specific needs their product solves, public sentiment, and market segmentation. Format as clean, concise markdown.` },
-                    { id: 'cost', title: '2. Cost', color: 'green', description: "What is the total cost to the customer, including price, time, and effort?", prompt: (c) => `Analyze ${c}'s "Cost" strategy (4Cs model). Detail their pricing strategy, competitor pricing comparison, total cost of ownership for customers, and perceived value for money. Format as clean, concise markdown.` },
-                    { id: 'convenience', title: '3. Convenience', color: 'purple', description: "How easy is it for customers to find, buy, and use the product?", prompt: (c) => `Analyze ${c}'s "Convenience" strategy (4Cs model). Detail their distribution channels, the ease of the purchasing process (UX), customer support accessibility, and product availability. Format as clean, concise markdown.` },
-                    { id: 'communication', title: '4. Communication', color: 'red', description: "How does the company engage in a two-way dialogue with its customers?", prompt: (c) => `Analyze ${c}'s "Communication" strategy (4Cs model). Detail their core brand message, primary marketing channels, PR strategy, and how they handle customer dialogue. Format as clean, concise markdown.` }
-                ]
-            },
-            'SWOT': {
-                components: [
-                    { id: 'strengths', title: '1. Strengths', color: 'green', description: "Internal, positive attributes of the company that are within its control.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its internal Strengths? Consider unique assets, skills, brand reputation, and resources that give it an advantage. Format as clean, concise markdown.` },
-                    { id: 'weaknesses', title: '2. Weaknesses', color: 'red', description: "Internal, negative factors that detract from the company's strengths.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its internal Weaknesses? Consider areas where it lacks resources, has a competitive disadvantage, or could improve internally. Format as clean, concise markdown.` },
-                    { id: 'opportunities', title: '3. Opportunities', color: 'blue', description: "External factors that the company could capitalize on to its advantage.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its external Opportunities? Consider market trends, technological advancements, and underserved market segments it could leverage. Format as clean, concise markdown.` },
-                    { id: 'threats', title: '4. Threats', color: 'purple', description: "External factors that could potentially harm the company's business.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its external Threats? Consider competitors, negative market trends, and regulatory changes that could pose a risk. Format as clean, concise markdown.` }
+                    { id: 'consumer', title: 'Consumer', prompt: (t) => `For ${t}, analyze its Consumer strategy (4Cs). List key points about its target audience and their needs. Return as a JSON object with a "points" array of strings.` },
+                    { id: 'cost', title: 'Cost', prompt: (t) => `For ${t}, analyze its Cost strategy (4Cs). List key points about its pricing and customer value. Return as a JSON object with a "points" array of strings.` },
+                    { id: 'convenience', title: 'Convenience', prompt: (t) => `For ${t}, analyze its Convenience strategy (4Cs). List key points about its distribution and accessibility. Return as a JSON object with a "points" array of strings.` },
+                    { id: 'communication', title: 'Communication', prompt: (t) => `For ${t}, analyze its Communication strategy (4Cs). List key points about its marketing and brand messaging. Return as a JSON object with a "points" array of strings.` }
                 ]
             },
             '4P': {
-                components: [
-                    { id: 'product', title: '1. Product', color: 'blue', description: "What the company sells, including its features, quality, and branding.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its core Product/service strategy, including features, quality, and differentiation from competitors. Format as clean, concise markdown.` },
-                    { id: 'price', title: '2. Price', color: 'green', description: "How much the product costs and the company's pricing strategy.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Price strategy, including its pricing model, how it compares to competitors, and its perceived value. Format as clean, concise markdown.` },
-                    { id: 'place', title: '3. Place', color: 'purple', description: "Where and how the product is distributed and sold to customers.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Place (distribution) strategy. Where are its products sold and what are its key channels? Format as clean, concise markdown.` },
-                    { id: 'promotion', title: '4. Promotion', color: 'red', description: "The marketing and communication strategies used to promote the product.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Promotion strategy. How does it advertise and communicate with its target market? Format as clean, concise markdown.` }
+                 title: "4P Marketing Mix",
+                 explanation: "The 4Ps are a foundational model for businesses, focusing on Product, Price, Place, and Promotion. It's a framework for identifying and controlling the key components of a marketing plan from the seller's point of view.",
+                 components: [
+                    { id: 'product', title: 'Product', prompt: (t) => `For ${t}, list key points about its Product (4Ps). Return JSON with a "points" array.` },
+                    { id: 'price', title: 'Price', prompt: (t) => `For ${t}, list key points about its Price (4Ps). Return JSON with a "points" array.` },
+                    { id: 'place', title: 'Place', prompt: (t) => `For ${t}, list key points about its Place/distribution (4Ps). Return JSON with a "points" array.` },
+                    { id: 'promotion', title: 'Promotion', prompt: (t) => `For ${t}, list key points about its Promotion (4Ps). Return JSON with a "points" array.` }
                 ]
             },
             '5C': {
+                title: "5C Analysis",
+                explanation: "The 5C analysis provides a comprehensive framework for evaluating the key internal and external factors affecting a business. It examines the Company itself, its Customers, Competitors, Collaborators, and the overall Climate or macro-environment.",
                 components: [
-                    { id: 'company', title: '1. Company', color: 'blue', description: "The company's goals, product lines, brand image, and capabilities.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail the Company's internal factors: its mission, vision, product lines, brand image, and core competencies. Format as clean, concise markdown.` },
-                    { id: 'customers', title: '2. Customers', color: 'green', description: "The target audience, their needs, motivations, and buying behavior.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Customers: Who are they, what are their needs, and what are their purchasing motivations and behaviors? Format as clean, concise markdown.` },
-                    { id: 'competitors', title: '3. Competitors', color: 'red', description: "Who the direct and indirect competitors are, and their strengths/weaknesses.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Competitors: Who are the direct and indirect competitors, and what are their primary strengths and weaknesses? Format as clean, concise markdown.` },
-                    { id: 'collaborators', title: '4. Collaborators', color: 'purple', description: "The suppliers, distributors, and key partners that impact the business.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Collaborators: Who are its key suppliers, distributors, agencies, and partners, and how do they impact the business? Format as clean, concise markdown.` },
-                    { id: 'climate', title: '5. Climate', color: 'yellow', description: "Macro-environmental factors (PESTEL) affecting the company.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail the Climate (Context): What are the macro-environmental PESTEL (Political, Economic, Social, Technological, Environmental, Legal) factors impacting the company? Format as clean, concise markdown.` }
+                    { id: 'company', title: 'Company', prompt: (t) => `For ${t}, list key points about the Company (5Cs). Return JSON with a "points" array.` },
+                    { id: 'customers', title: 'Customers', prompt: (t) => `For ${t}, list key points about its Customers (5Cs). Return JSON with a "points" array.` },
+                    { id: 'competitors', title: 'Competitors', prompt: (t) => `For ${t}, list key points about its Competitors (5Cs). Return JSON with a "points" array.` },
+                    { id: 'collaborators', title: 'Collaborators', prompt: (t) => `For ${t}, list key points about its Collaborators (5Cs). Return JSON with a "points" array.` },
+                    { id: 'climate', title: 'Climate', prompt: (t) => `For ${t}, list key points about the Climate/Context (5Cs). Return JSON with a "points" array.` }
                 ]
             },
             '7P': {
+                title: "7P Service Mix",
+                explanation: "The 7Ps model is an extension of the 4Ps, designed specifically for service-based businesses. It adds People, Process, and Physical Evidence to the original framework to account for the intangible nature of services and the importance of the customer experience.",
                 components: [
-                    { id: 'product', title: '1. Product', color: 'blue', description: "What the company sells, including its features, quality, and branding.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its core Product/service strategy, including features, quality, and differentiation. Format as clean, concise markdown.` },
-                    { id: 'price', title: '2. Price', color: 'green', description: "How much the product costs and the company's pricing strategy.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Price strategy, including its pricing model and competitor comparison. Format as clean, concise markdown.` },
-                    { id: 'place', title: '3. Place', color: 'purple', description: "Where and how the product is distributed and sold to customers.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Place (distribution) strategy and key channels. Format as clean, concise markdown.` },
-                    { id: 'promotion', title: '4. Promotion', color: 'red', description: "The marketing and communication strategies used to promote the product.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Promotion strategy and communication tactics. Format as clean, concise markdown.` },
-                    { id: 'people', title: '5. People', color: 'yellow', description: "The employees and customer service representatives who deliver the service.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the People involved in service delivery, including their skills and impact on customer experience. Format as clean, concise markdown.` },
-                    { id: 'process', title: '6. Process', color: 'indigo', description: "The systems and workflows used to deliver the service to the customer.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the Processes for service delivery. How efficient and customer-friendly are they? Format as clean, concise markdown.` },
-                    { id: 'physical', title: '7. Physical Evidence', color: 'pink', description: "The tangible environment where the service is delivered (e.g., website, store).", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the Physical Evidence of the service, such as the store environment, packaging, or website design. Format as clean, concise markdown.` }
+                     { id: 'product', title: 'Product', prompt: (t) => `For ${t}, list key points about its Product (7Ps). Return JSON with a "points" array.` },
+                     { id: 'price', title: 'Price', prompt: (t) => `For ${t}, list key points about its Price (7Ps). Return JSON with a "points" array.` },
+                     { id: 'place', title: 'Place', prompt: (t) => `For ${t}, list key points about its Place/distribution (7Ps). Return JSON with a "points" array.` },
+                     { id: 'promotion', title: 'Promotion', prompt: (t) => `For ${t}, list key points about its Promotion (7Ps). Return JSON with a "points" array.` },
+                     { id: 'people', title: 'People', prompt: (t) => `For ${t}, list key points about its People (7Ps). Return JSON with a "points" array.` },
+                     { id: 'process', title: 'Process', prompt: (t) => `For ${t}, list key points about its Process (7Ps). Return JSON with a "points" array.` },
+                     { id: 'physical', title: 'Physical Evidence', prompt: (t) => `For ${t}, list key points about its Physical Evidence (7Ps). Return JSON with a "points" array.` }
                 ]
             }
         };
 
-        const cardColors = {
-            blue: 'text-blue-800',
-            green: 'text-green-800',
-            purple: 'text-purple-800',
-            red: 'text-red-800',
-            yellow: 'text-yellow-800',
-            indigo: 'text-indigo-800',
-            pink: 'text-pink-800',
-        };
-
-        function renderFrameworkUI(frameworkKey) {
-            const framework = analysisFrameworks[frameworkKey];
-            if (!framework) return;
-            
-            resultsGrid.innerHTML = ''; 
-
+        function setInitialPlaceholders() {
+            financialsContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-zinc-500">Financials will be generated after analysis.</p></div>`;
+            reportContainer.classList.add('hidden');
+        }
+        
+        function renderFrameworkUI(framework, gridId) {
+            const grid = document.getElementById(gridId);
+            if (!framework || !grid) return;
+            grid.innerHTML = '';
             framework.components.forEach(component => {
-                const colorClass = cardColors[component.color] || 'text-gray-800';
                 const cardHTML = `
-                    <div class="card bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex flex-col">
-                        <h2 class="text-2xl font-bold ${colorClass} mb-3">${component.title}</h2>
-                        <p class="text-gray-600 mb-4 flex-grow">${component.description}</p>
-                        <div id="content-${component.id}" class="prose prose-sm max-w-none text-gray-700">
-                            <p>Enter a company name above to generate analysis.</p>
+                    <div class="card p-6 flex flex-col h-full">
+                        <h3 class="text-xl font-bold accent-gold mb-4">${component.title}</h3>
+                        <div id="content-${component.id}" class="space-y-3 mt-auto">
+                            <div class="loader"></div>
                         </div>
-                    </div>
-                `;
-                resultsGrid.insertAdjacentHTML('beforeend', cardHTML);
+                    </div>`;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
             });
         }
 
-        frameworkSelect.addEventListener('change', (e) => {
-            renderFrameworkUI(e.target.value);
-        });
+        const delay = ms => new Promise(res => setTimeout(res, ms));
 
         researchBtn.addEventListener('click', async () => {
             errorMessageEl.textContent = '';
             const companyName = companyNameInput.value.trim();
+            const businessUnit = businessUnitSelect.value;
+
             if (!companyName) {
                 errorMessageEl.textContent = 'Please enter a company name.';
                 return;
             }
+            if (USER_API_KEY === "PASTE_YOUR_API_KEY_HERE") {
+                errorMessageEl.textContent = 'Please add your API key to the script to publish this site.';
+                return;
+            }
+
+            const analysisTarget = businessUnit ? `${businessUnit} (a sub-business of ${companyName})` : companyName;
 
             researchBtn.disabled = true;
             researchBtn.textContent = 'Analyzing...';
+            reportContainer.classList.remove('hidden');
+            
+            reportHeader.innerHTML = `<h1 class="text-4xl font-bold text-white">${companyName}</h1>` + 
+                (businessUnit ? `<h2 class="text-2xl text-zinc-400 mt-2">Analysis for Business Unit: ${businessUnit}</h2>` : '');
 
-            const frameworkKey = frameworkSelect.value;
-            const framework = analysisFrameworks[frameworkKey];
+            const selectedFrameworkKey = frameworkSelect.value;
+            const selectedFramework = analysisFrameworks[selectedFrameworkKey];
+            
+            modelExplanationSection.innerHTML = `
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold text-white mb-3">${selectedFramework.title} Explained</h3>
+                    <p class="text-zinc-400">${selectedFramework.explanation}</p>
+                </div>
+            `;
 
-            for (const component of framework.components) {
+            resultsContainer.innerHTML = `
+                <h2 class="text-3xl font-bold text-white mb-4 text-center">${selectedFramework.title}</h2>
+                <div id="main-analysis-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <h2 class="text-3xl font-bold text-white mb-4 mt-12 text-center">${swotFramework.title}</h2>
+                <div id="swot-analysis-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            `;
+            
+            renderFrameworkUI(selectedFramework, 'main-analysis-grid');
+            renderFrameworkUI(swotFramework, 'swot-analysis-grid');
+            
+            await fetchFinancials(analysisTarget, !!businessUnit);
+
+            const allComponents = [...selectedFramework.components, ...swotFramework.components];
+            for (const component of allComponents) {
                 const contentArea = document.getElementById(`content-${component.id}`);
-                await fetchAnalysis(companyName, component, contentArea);
+                await fetchAnalysis(analysisTarget, component, contentArea);
+                await delay(250);
             }
             
             researchBtn.disabled = false;
             researchBtn.textContent = 'Analyze';
         });
         
-        companyNameInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                researchBtn.click();
+        companyNameInput.addEventListener('blur', async () => {
+            const companyName = companyNameInput.value.trim();
+            if (companyName) {
+                researchBtn.disabled = true;
+                researchBtn.textContent = 'Loading...';
+                await fetchBusinessUnits(companyName);
+                researchBtn.disabled = false;
+                researchBtn.textContent = 'Analyze';
             }
         });
-        
-        /**
-         * A more robust markdown to HTML converter.
-         * Handles headings, lists, bold, and italics.
-         * @param {string} markdown - The markdown text from the AI.
-         * @returns {string} - The converted HTML.
-         */
-        function improvedMarkdownToHtml(markdown) {
-            let cleanMd = markdown.trim();
-            const lines = cleanMd.split('\n');
-            let html = '';
-            let inList = false;
 
-            for (let line of lines) {
-                line = line.trim();
-                
-                // Skip empty lines
-                if (line === '') continue;
-
-                // Process bold and italics first
-                line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>');
-                line = line.replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_(.*?)_/g, '<em>$1</em>');
-                
-                // Handle Headings (remove hashtags)
-                if (line.startsWith('#')) {
-                    line = line.replace(/#/g, '').trim();
-                }
-
-                // Handle List Items
-                if (line.startsWith('- ') || line.startsWith('* ')) {
-                    if (!inList) {
-                        html += '<ul>';
-                        inList = true;
-                    }
-                    html += `<li>${line.substring(2)}</li>`;
-                } else {
-                    if (inList) {
-                        html += '</ul>';
-                        inList = false;
-                    }
-                    html += `<p>${line}</p>`;
-                }
+        function extractJson(text) {
+            const startIndex = text.indexOf('{');
+            const endIndex = text.lastIndexOf('}');
+            if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+                console.error("Could not find a valid JSON object in the text:", text);
+                return null;
             }
-
-            if (inList) {
-                html += '</ul>';
+            const jsonString = text.substring(startIndex, endIndex + 1);
+            try {
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error("Failed to parse extracted JSON string:", jsonString, error);
+                return null;
             }
-
-            return html;
         }
 
-        async function fetchAnalysis(companyName, component, contentArea) {
-            contentArea.innerHTML = '<div class="loader"></div>';
-            const promptText = component.prompt(companyName);
-            
-            const payload = { contents: [{ role: "user", parts: [{ text: promptText }] }] };
-            const apiKey = ""; // Handled by environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        async function fetchBusinessUnits(companyName) {
+            businessUnitSelect.innerHTML = `<option value="">Loading units...</option>`;
+            businessUnitSelect.disabled = true;
+            const prompt = `List the main business units or product lines for ${companyName}. Return a single JSON object with a key "units" which is an array of strings. If none, return an empty array.`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${USER_API_KEY}`;
 
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
-                }
-
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}.`);
                 const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                const data = extractJson(text);
+                
+                businessUnitSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = "Company-wide Analysis";
+                businessUnitSelect.appendChild(defaultOption);
 
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    contentArea.innerHTML = improvedMarkdownToHtml(text);
+                if (data && data.units && data.units.length > 0) {
+                    data.units.forEach(unit => {
+                        const option = document.createElement('option');
+                        option.value = unit;
+                        option.textContent = unit;
+                        businessUnitSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching business units:', error);
+                businessUnitSelect.innerHTML = `<option value="">Could not load units</option>`;
+            } finally {
+                businessUnitSelect.disabled = false;
+            }
+        }
+
+        async function fetchFinancials(analysisTarget, isSubBusiness) {
+            financialsContainer.innerHTML = `<div class="loader"></div>`;
+            let prompt = `Generate hypothetical financial data for ${analysisTarget} for the last three years (2022, 2023, 2024). Provide numbers in millions of USD for financials, and absolute numbers for headcount. Return a single JSON object with keys: "revenue", "grossProfit", "netProfit", "inventoryValue", and "headcount". Each key should have an array of three numbers for the years [2022, 2023, 2024]. For example: {"revenue": [100, 120, 150], "headcount": [5000, 5500, 6000] ...}`;
+            if (isSubBusiness) {
+                prompt += ` If specific financial data for this sub-business is not publicly available, set the "revenue" array to [0, 0, 0] as an indicator.`;
+            }
+
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${USER_API_KEY}`;
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}.`);
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                const data = extractJson(text);
+
+                if (data && data.revenue && data.revenue.some(v => v > 0)) {
+                    renderFinancialsTable(data);
+                } else if (isSubBusiness) {
+                    financialsContainer.innerHTML = `<div class="h-full flex items-center justify-center p-4"><p class="text-zinc-400 text-center">Specific financial data for sub-businesses is often not publicly disclosed. The analysis will proceed based on qualitative information.</p></div>`;
+                }
+                else {
+                     financialsContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-red-400">Could not parse financial data.</p></div>`;
+                }
+            } catch (error) {
+                console.error('Error fetching financials:', error);
+                financialsContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-red-400">Could not generate financial data. ${error.message}</p></div>`;
+            }
+        }
+        
+        function renderFinancialsTable(data) {
+            const years = ['2024', '2023', '2022'];
+            const metrics = [
+                { key: 'revenue', label: 'Revenue' },
+                { key: 'grossProfit', label: 'Gross Profit' },
+                { key: 'netProfit', label: 'Net Profit' },
+                { key: 'inventoryValue', label: 'Inventory Value' },
+                { key: 'headcount', label: 'Headcount' }
+            ];
+
+            let tableHTML = `
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b-2 border-zinc-700">
+                            <th class="py-2 px-3 font-semibold text-zinc-400 text-sm">Metric</th>
+                            <th class="py-2 px-3 font-semibold text-zinc-400 text-right text-sm">${years[0]}</th>
+                            <th class="py-2 px-3 font-semibold text-zinc-400 text-right text-sm">${years[1]}</th>
+                            <th class="py-2 px-3 font-semibold text-zinc-400 text-right text-sm">${years[2]}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-zinc-200 text-base">
+            `;
+
+            metrics.forEach((metric, index) => {
+                const isMoney = metric.key !== 'headcount';
+                const values = data[metric.key] || [0, 0, 0];
+                tableHTML += `
+                    <tr class="border-b border-zinc-800 last:border-b-0">
+                        <td class="py-3 px-3 font-medium">${metric.label}</td>
+                        <td class="py-3 px-3 text-right">${isMoney ? '$' + values[2] + 'M' : values[2].toLocaleString()}</td>
+                        <td class="py-3 px-3 text-right">${isMoney ? '$' + values[1] + 'M' : values[1].toLocaleString()}</td>
+                        <td class="py-3 px-3 text-right">${isMoney ? '$' + values[0] + 'M' : values[0].toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `</tbody></table>`;
+            financialsContainer.innerHTML = tableHTML;
+        }
+
+        async function fetchAnalysis(analysisTarget, component, contentArea) {
+            contentArea.innerHTML = '<div class="loader"></div>';
+            const promptText = component.prompt(analysisTarget);
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${USER_API_KEY}`;
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}.`);
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                const data = extractJson(text);
+
+                if (data && data.points && data.points.length > 0) {
+                    contentArea.innerHTML = '';
+                    data.points.forEach(point => {
+                        const pointHTML = `
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 pt-1">${getIcon(component.id)}</div>
+                                <p class="text-zinc-300">${point}</p>
+                            </div>`;
+                        contentArea.insertAdjacentHTML('beforeend', pointHTML);
+                    });
                 } else {
-                    contentArea.innerHTML = '<p class="text-red-500">Could not retrieve analysis. The response was empty.</p>';
-                    console.error("Unexpected API response structure:", result);
+                    contentArea.innerHTML = `<p class="text-zinc-500">No specific points were found.</p>`;
                 }
             } catch (error) {
                 console.error(`Error fetching ${component.id} analysis:`, error);
-                contentArea.innerHTML = `<p class="text-red-500">An error occurred: ${error.message}. Please try again later.</p>`;
+                contentArea.innerHTML = `<p class="text-red-400">Could not load analysis. ${error.message}</p>`;
             }
         }
 
         // Initial render
-        renderFrameworkUI(frameworkSelect.value);
+        setInitialPlaceholders();
     </script>
 
 </body>
