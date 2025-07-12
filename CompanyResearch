@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Framework Company Research Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #researchBtn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .framework-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+        }
+        /* Tailwind Prose Customization */
+        .prose h3 { margin-top: 1em; margin-bottom: 0.5em; }
+        .prose p { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .prose ul { margin-top: 0.5em; margin-bottom: 0.5em; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-6 py-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Company Research Platform</h1>
+            <p class="mt-2 text-md md:text-lg text-gray-600">Dynamic analysis using your chosen framework.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <div class="max-w-3xl mx-auto mb-4 text-center">
+            <p id="error-message" class="text-red-500 font-semibold h-6"></p>
+        </div>
+        <div class="max-w-3xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div class="md:col-span-2">
+                <input type="text" id="companyName" placeholder="Enter a company name (e.g., 'Netflix')" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-full">
+            </div>
+            <div>
+                 <select id="frameworkSelect" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-full framework-select bg-white">
+                    <option value="4C">4C Analysis</option>
+                    <option value="SWOT">SWOT Analysis</option>
+                    <option value="4P">4P Marketing Mix</option>
+                    <option value="5C">5C Analysis</option>
+                    <option value="7P">7P Service Mix</option>
+                </select>
+            </div>
+        </div>
+        <div class="max-w-3xl mx-auto mb-8 text-center">
+            <button id="researchBtn" class="w-full md:w-1/3 bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-lg">
+                Analyze
+            </button>
+        </div>
+
+        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Analysis cards will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <footer class="text-center py-6 mt-8">
+        <p class="text-gray-500">Powered by AI | Designed for ambitious job seekers.</p>
+    </footer>
+
+    <script>
+        // --- DOM Element References ---
+        const researchBtn = document.getElementById('researchBtn');
+        const companyNameInput = document.getElementById('companyName');
+        const errorMessageEl = document.getElementById('error-message');
+        const frameworkSelect = document.getElementById('frameworkSelect');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        // --- Framework Definitions ---
+        const analysisFrameworks = {
+            '4C': {
+                components: [
+                    { id: 'consumer', title: '1. Consumer', color: 'blue', description: "Who are the customers? What are their needs, wants, and problems?", prompt: (c) => `Analyze ${c}'s "Consumer" strategy (4Cs model). Detail their target audience (demographics, psychographics), the specific needs their product solves, public sentiment, and market segmentation. Format as clean, concise markdown.` },
+                    { id: 'cost', title: '2. Cost', color: 'green', description: "What is the total cost to the customer, including price, time, and effort?", prompt: (c) => `Analyze ${c}'s "Cost" strategy (4Cs model). Detail their pricing strategy, competitor pricing comparison, total cost of ownership for customers, and perceived value for money. Format as clean, concise markdown.` },
+                    { id: 'convenience', title: '3. Convenience', color: 'purple', description: "How easy is it for customers to find, buy, and use the product?", prompt: (c) => `Analyze ${c}'s "Convenience" strategy (4Cs model). Detail their distribution channels, the ease of the purchasing process (UX), customer support accessibility, and product availability. Format as clean, concise markdown.` },
+                    { id: 'communication', title: '4. Communication', color: 'red', description: "How does the company engage in a two-way dialogue with its customers?", prompt: (c) => `Analyze ${c}'s "Communication" strategy (4Cs model). Detail their core brand message, primary marketing channels, PR strategy, and how they handle customer dialogue. Format as clean, concise markdown.` }
+                ]
+            },
+            'SWOT': {
+                components: [
+                    { id: 'strengths', title: '1. Strengths', color: 'green', description: "Internal, positive attributes of the company that are within its control.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its internal Strengths? Consider unique assets, skills, brand reputation, and resources that give it an advantage. Format as clean, concise markdown.` },
+                    { id: 'weaknesses', title: '2. Weaknesses', color: 'red', description: "Internal, negative factors that detract from the company's strengths.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its internal Weaknesses? Consider areas where it lacks resources, has a competitive disadvantage, or could improve internally. Format as clean, concise markdown.` },
+                    { id: 'opportunities', title: '3. Opportunities', color: 'blue', description: "External factors that the company could capitalize on to its advantage.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its external Opportunities? Consider market trends, technological advancements, and underserved market segments it could leverage. Format as clean, concise markdown.` },
+                    { id: 'threats', title: '4. Threats', color: 'purple', description: "External factors that could potentially harm the company's business.", prompt: (c) => `Conduct a SWOT analysis for ${c}. What are its external Threats? Consider competitors, negative market trends, and regulatory changes that could pose a risk. Format as clean, concise markdown.` }
+                ]
+            },
+            '4P': {
+                components: [
+                    { id: 'product', title: '1. Product', color: 'blue', description: "What the company sells, including its features, quality, and branding.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its core Product/service strategy, including features, quality, and differentiation from competitors. Format as clean, concise markdown.` },
+                    { id: 'price', title: '2. Price', color: 'green', description: "How much the product costs and the company's pricing strategy.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Price strategy, including its pricing model, how it compares to competitors, and its perceived value. Format as clean, concise markdown.` },
+                    { id: 'place', title: '3. Place', color: 'purple', description: "Where and how the product is distributed and sold to customers.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Place (distribution) strategy. Where are its products sold and what are its key channels? Format as clean, concise markdown.` },
+                    { id: 'promotion', title: '4. Promotion', color: 'red', description: "The marketing and communication strategies used to promote the product.", prompt: (c) => `Analyze ${c}'s Marketing Mix (4Ps). Detail its Promotion strategy. How does it advertise and communicate with its target market? Format as clean, concise markdown.` }
+                ]
+            },
+            '5C': {
+                components: [
+                    { id: 'company', title: '1. Company', color: 'blue', description: "The company's goals, product lines, brand image, and capabilities.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail the Company's internal factors: its mission, vision, product lines, brand image, and core competencies. Format as clean, concise markdown.` },
+                    { id: 'customers', title: '2. Customers', color: 'green', description: "The target audience, their needs, motivations, and buying behavior.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Customers: Who are they, what are their needs, and what are their purchasing motivations and behaviors? Format as clean, concise markdown.` },
+                    { id: 'competitors', title: '3. Competitors', color: 'red', description: "Who the direct and indirect competitors are, and their strengths/weaknesses.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Competitors: Who are the direct and indirect competitors, and what are their primary strengths and weaknesses? Format as clean, concise markdown.` },
+                    { id: 'collaborators', title: '4. Collaborators', color: 'purple', description: "The suppliers, distributors, and key partners that impact the business.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail its Collaborators: Who are its key suppliers, distributors, agencies, and partners, and how do they impact the business? Format as clean, concise markdown.` },
+                    { id: 'climate', title: '5. Climate', color: 'yellow', description: "Macro-environmental factors (PESTEL) affecting the company.", prompt: (c) => `Conduct a 5C analysis for ${c}. Detail the Climate (Context): What are the macro-environmental PESTEL (Political, Economic, Social, Technological, Environmental, Legal) factors impacting the company? Format as clean, concise markdown.` }
+                ]
+            },
+            '7P': {
+                components: [
+                    { id: 'product', title: '1. Product', color: 'blue', description: "What the company sells, including its features, quality, and branding.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its core Product/service strategy, including features, quality, and differentiation. Format as clean, concise markdown.` },
+                    { id: 'price', title: '2. Price', color: 'green', description: "How much the product costs and the company's pricing strategy.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Price strategy, including its pricing model and competitor comparison. Format as clean, concise markdown.` },
+                    { id: 'place', title: '3. Place', color: 'purple', description: "Where and how the product is distributed and sold to customers.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Place (distribution) strategy and key channels. Format as clean, concise markdown.` },
+                    { id: 'promotion', title: '4. Promotion', color: 'red', description: "The marketing and communication strategies used to promote the product.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail its Promotion strategy and communication tactics. Format as clean, concise markdown.` },
+                    { id: 'people', title: '5. People', color: 'yellow', description: "The employees and customer service representatives who deliver the service.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the People involved in service delivery, including their skills and impact on customer experience. Format as clean, concise markdown.` },
+                    { id: 'process', title: '6. Process', color: 'indigo', description: "The systems and workflows used to deliver the service to the customer.", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the Processes for service delivery. How efficient and customer-friendly are they? Format as clean, concise markdown.` },
+                    { id: 'physical', title: '7. Physical Evidence', color: 'pink', description: "The tangible environment where the service is delivered (e.g., website, store).", prompt: (c) => `Analyze ${c}'s Service Mix (7Ps). Detail the Physical Evidence of the service, such as the store environment, packaging, or website design. Format as clean, concise markdown.` }
+                ]
+            }
+        };
+
+        const cardColors = {
+            blue: 'text-blue-800',
+            green: 'text-green-800',
+            purple: 'text-purple-800',
+            red: 'text-red-800',
+            yellow: 'text-yellow-800',
+            indigo: 'text-indigo-800',
+            pink: 'text-pink-800',
+        };
+
+        function renderFrameworkUI(frameworkKey) {
+            const framework = analysisFrameworks[frameworkKey];
+            if (!framework) return;
+            
+            resultsGrid.innerHTML = ''; 
+
+            framework.components.forEach(component => {
+                const colorClass = cardColors[component.color] || 'text-gray-800';
+                const cardHTML = `
+                    <div class="card bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex flex-col">
+                        <h2 class="text-2xl font-bold ${colorClass} mb-3">${component.title}</h2>
+                        <p class="text-gray-600 mb-4 flex-grow">${component.description}</p>
+                        <div id="content-${component.id}" class="prose prose-sm max-w-none text-gray-700">
+                            <p>Enter a company name above to generate analysis.</p>
+                        </div>
+                    </div>
+                `;
+                resultsGrid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        frameworkSelect.addEventListener('change', (e) => {
+            renderFrameworkUI(e.target.value);
+        });
+
+        researchBtn.addEventListener('click', async () => {
+            errorMessageEl.textContent = '';
+            const companyName = companyNameInput.value.trim();
+            if (!companyName) {
+                errorMessageEl.textContent = 'Please enter a company name.';
+                return;
+            }
+
+            researchBtn.disabled = true;
+            researchBtn.textContent = 'Analyzing...';
+
+            const frameworkKey = frameworkSelect.value;
+            const framework = analysisFrameworks[frameworkKey];
+
+            for (const component of framework.components) {
+                const contentArea = document.getElementById(`content-${component.id}`);
+                await fetchAnalysis(companyName, component, contentArea);
+            }
+            
+            researchBtn.disabled = false;
+            researchBtn.textContent = 'Analyze';
+        });
+        
+        companyNameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                researchBtn.click();
+            }
+        });
+        
+        /**
+         * A more robust markdown to HTML converter.
+         * Handles headings, lists, bold, and italics.
+         * @param {string} markdown - The markdown text from the AI.
+         * @returns {string} - The converted HTML.
+         */
+        function improvedMarkdownToHtml(markdown) {
+            let cleanMd = markdown.trim();
+            const lines = cleanMd.split('\n');
+            let html = '';
+            let inList = false;
+
+            for (let line of lines) {
+                line = line.trim();
+                
+                // Skip empty lines
+                if (line === '') continue;
+
+                // Process bold and italics first
+                line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>');
+                line = line.replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_(.*?)_/g, '<em>$1</em>');
+                
+                // Handle Headings (remove hashtags)
+                if (line.startsWith('#')) {
+                    line = line.replace(/#/g, '').trim();
+                }
+
+                // Handle List Items
+                if (line.startsWith('- ') || line.startsWith('* ')) {
+                    if (!inList) {
+                        html += '<ul>';
+                        inList = true;
+                    }
+                    html += `<li>${line.substring(2)}</li>`;
+                } else {
+                    if (inList) {
+                        html += '</ul>';
+                        inList = false;
+                    }
+                    html += `<p>${line}</p>`;
+                }
+            }
+
+            if (inList) {
+                html += '</ul>';
+            }
+
+            return html;
+        }
+
+        async function fetchAnalysis(companyName, component, contentArea) {
+            contentArea.innerHTML = '<div class="loader"></div>';
+            const promptText = component.prompt(companyName);
+            
+            const payload = { contents: [{ role: "user", parts: [{ text: promptText }] }] };
+            const apiKey = ""; // Handled by environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    contentArea.innerHTML = improvedMarkdownToHtml(text);
+                } else {
+                    contentArea.innerHTML = '<p class="text-red-500">Could not retrieve analysis. The response was empty.</p>';
+                    console.error("Unexpected API response structure:", result);
+                }
+            } catch (error) {
+                console.error(`Error fetching ${component.id} analysis:`, error);
+                contentArea.innerHTML = `<p class="text-red-500">An error occurred: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        // Initial render
+        renderFrameworkUI(frameworkSelect.value);
+    </script>
+
+</body>
+</html>
